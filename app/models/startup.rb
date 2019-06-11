@@ -53,9 +53,37 @@ class Startup
       startup.domain
     end
   end
-
+  # - `Startup#sign_contract`
+  #   - given a **venture capitalist object**, type of investment (as a string), and the amount invested (as a float),
+  #   creates a new funding round and associates it with that startup and venture capitalist.
   def sing_contract(venture_capitalist, type, investment)
     FundingRound.new(self, venture_capitalist, type, investment)
+  end
+
+  def funding_rounds
+    FundingRound.all.select {|funding| funding.startup == self}
+  end
+  # - `Startup#num_funding_rounds`
+  #   - Returns the total number of funding rounds that the startup has gotten
+  def num_funding_rounds
+    funding_rounds.count
+  end
+  # - `Startup#total_funds`
+  #   - Returns the total sum of investments that the startup has gotten
+  def total_funds
+    funding_rounds.inject(0) {|sum, funding| sum + funding.investment}
+  end
+  # - `Startup#investors`
+  #   - Returns a **unique** array of all the venture capitalists that have invested in this company
+  def investors
+    funding_rounds.map {|funding| funding.v_c}.uniq
+  end
+  # - `Startup#big_investors`
+  #   - Returns a **unique** array of all the venture capitalists that have invested in this
+  #   company and are in the Trés Commas club
+  def big_investors
+    funding_rounds.map {|funding| funding.v_c if VentureCapitalist.tres_commas_club.include?(funding.v_c)}.compact.uniq
+
   end
 
 
